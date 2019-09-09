@@ -23,13 +23,11 @@ function keyPressed() {
 function setup() {
   createCanvas(240, 400);
   slider = createSlider(0, 1000, 0);
-  //slider2 = createSlider(0, 100, 50);
   for (var i = 0; i < playerCount; i++) {
     let player = new Player();
     player.reset();
     players.push(player);
   }
-  //console.log(players.length);
 }
 
 function draw() {
@@ -37,7 +35,6 @@ function draw() {
   if (players.length == 0) {
     players = populate(savedPlayers);
     savedPlayers = [];
-    //console.log(players);
   }
   for (var i = 0; i < players.length; i++) {
     let player = players[i];
@@ -47,16 +44,11 @@ function draw() {
     if ((millis() - player.time) > slider.value()) {
       player.drop(players, i);
       player.fitness++;
-      //console.log(player.fitness);
     }
-    // if (keyIsDown(DOWN_ARROW)) {
-    //   player.drop();
-    // }
   }
 }
 
 function movePlayer(movearr, arena, player) {
-  //let move = movearr;
   let move = indexOfMax(movearr);
   if (move == 0) {
     player.x--;
@@ -76,24 +68,6 @@ function movePlayer(movearr, arena, player) {
       player.rotate();
     }
   }
-  // if (move[0] < 0.25) {
-  //   player.x--;
-  //   if (player.collide()) { // recovery
-  //     player.x++;
-  //   }
-  // } else if (move[0] < 0.5) {} else if (move[0] < 0.75) {
-  //   player.x++;
-  //   if (collide(arena, player)) { // recovery
-  //     player.x--;
-  //   }
-  // } else {
-  //   player.rotate();
-  //   if (collide(arena, player)) { // recovery
-  //     player.rotate();
-  //     player.rotate();
-  //     player.rotate();
-  //   }
-  // }
 }
 
 function indexOfMax(arr) {
@@ -171,22 +145,14 @@ function arenaSweep(arena, player) {
   let rowCount = 1;
   player.lowestHeight = 20;
   player.height = 0;
-  //  console.log(arena.length);
   for (let y = 0; y < arena.length; y++) {
     let full = 1;
     for (let x = 0; x < arena[y].length; x++) {
-      //console.log("X length: " + arena[y].length);
       if (arena[y][x] == 0) {
         full = 0;
         break;
-      } else {
-        // player.height = y;
-        // if (player.height < player.lowestHeight) {
-        //   player.lowestHeight = player.height;
-        // }
       }
     }
-    //  player.fitness += player.pieces / (player.lowestHeight + 1);
     if (full == 1) {
       arena.splice(y, 1);
       arena.unshift(new Array(width / edge).fill(0));
@@ -196,13 +162,10 @@ function arenaSweep(arena, player) {
       rowCount *= 2;
     }
   }
-  //console.log("Best row count: " + tempFitness);
 }
 
 function choise(gamePlan, brain) {
-  //  console.table(gamePlan.matrix);
   let outputs = brain.feedforward(gamePlan);
-  //console.log(outputs);
   return outputs;
 }
 
@@ -268,29 +231,25 @@ function Player() {
   for (let i = 0; i < this.arena.length; i++) {
     this.arena[i] = new Array(width / edge).fill(0);
   }
-  //  console.log(this.arena);
   this.matrix = null;
   this.score = 0;
-  this.reset = function(players, index) {
+  this.reset = function (players, index) {
     this.x = (width / edge) / 2 - 1;
     this.y = 0;
-    this.matrix = createPiece(1);
-    //  this.matrix = createPiece(Math.floor(Math.random() * 7));
+    this.matrix = createPiece(Math.floor(Math.random() * 7));
     if (collide(this.arena, this)) {
       for (let i = 0; i < this.arena.length; i++) {
         this.arena[i].fill(0);
       }
-      //this.fitness += this.rowCount;
       savedPlayers.push(this);
-      //console.log(savedPlayers);
       players.splice(index, 1);
     }
     this.updateScore();
   }
-  this.collide = function() {
+  this.collide = function () {
     return collide(this.arena, this);
   }
-  this.drop = function(players, i) {
+  this.drop = function (players, i) {
     this.y++;
     if (collide(this.arena, this)) {
       this.y--; // recovery
@@ -301,7 +260,7 @@ function Player() {
     }
     this.time = millis();
   }
-  this.rotate = function() {
+  this.rotate = function () {
     this.matrix.reverse();
     for (let y = 0; y < this.matrix.length; y++) {
       for (let x = y + 1; x < this.matrix[y].length; x++) {
@@ -309,7 +268,7 @@ function Player() {
       }
     }
   }
-  this.updateScore = function() {
+  this.updateScore = function () {
     document.getElementById("score").innerText = this.score;
   }
 }
@@ -325,11 +284,8 @@ function populate(pPlayers) {
     sum += pPlayers[i].fitness;
   }
   while (rplayers.length < pPlayers.length) {
-    //console.log("Mating: ");
     let mateOne = pickOne(pPlayers, sum);
-    //console.log("Mate One Score: " + mateOne.fitness);
     let mateTwo = pickOne(pPlayers, sum);
-    //console.log("Mate Two Score: " + mateTwo.fitness);
     mateOne.brain.MateWith(mateTwo.brain);
     let nplayer = new Player();
     nplayer.reset();
@@ -338,13 +294,6 @@ function populate(pPlayers) {
     rplayers.push(nplayer);
   }
   console.log("Median score: " + sum / rplayers.length);
-  // for (var i = 0; i < playerCount; i++) {
-  //   let nPlayer = new Player()
-  //   nPlayer.reset();
-  //   nPlayer.brain = bbplayer.brain.copy();
-  //   nPlayer.brain.mutate(randnb);
-  //   rplayers.push(nPlayer);
-  // }
   return rplayers;
 }
 
