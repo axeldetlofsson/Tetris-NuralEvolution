@@ -4,6 +4,8 @@ let savedPlayers = [];
 let slider;
 let slider2;
 let value = 0;
+let iteration = 0;
+var chartData = [];
 let randnb = 0.1;
 let playerCount = 50;
 let colors = ['blue', 'pink', 'yellow', 'orange', 'red', 'green', 'purple'];
@@ -21,8 +23,10 @@ function keyPressed() {
 }
 
 function setup() {
-  createCanvas(240, 400);
+  var canvas = createCanvas(240, 400);
+  canvas.parent('sketch-holder');
   slider = createSlider(0, 1000, 0);
+  slider.parent('slider');
   for (var i = 0; i < playerCount; i++) {
     let player = new Player();
     player.reset();
@@ -244,7 +248,7 @@ function Player() {
       savedPlayers.push(this);
       players.splice(index, 1);
     }
-    this.updateScore();
+    //    this.updateScore();
   }
   this.collide = function () {
     return collide(this.arena, this);
@@ -269,11 +273,13 @@ function Player() {
     }
   }
   this.updateScore = function () {
-    document.getElementById("score").innerText = this.score;
+    document.getElementById("score").innerText = "Score: " + this.score;
+    console.log("Updated");
   }
 }
 
 function populate(pPlayers) {
+  iteration += 1;
   let bbplayer;
   var bestSore = 0;
   var bPlayer;
@@ -293,7 +299,14 @@ function populate(pPlayers) {
     nplayer.brain.mutate(Math.random());
     rplayers.push(nplayer);
   }
-  console.log("Median score: " + sum / rplayers.length);
+  var medFitness = sum / rplayers.length;
+  console.log("Median score: " + medFitness);
+  chartData.push({
+    x: iteration,
+    y: medFitness
+  });
+  renderChart(chartData)
+
   return rplayers;
 }
 
@@ -324,5 +337,29 @@ function pickbest(pPlayers) {
   console.log("Median score: " + Math.round(sum));
   console.log("Best: " + bPlayers[(bPlayers.length - 1)].fitness);
   console.log("Worst: " + bPlayers[0].fitness);
+
   return bPlayers[(bPlayers.length - 1)];
+}
+
+function renderChart(datachart) {
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var scatterChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'Population Fitness',
+        data: datachart
+      }]
+    },
+    options: {
+      animation: false,
+      scales: {
+        xAxes: [{
+          type: 'linear',
+          position: 'bottom'
+        }]
+      }
+    }
+  });
+
 }
