@@ -311,14 +311,22 @@ function populate(pPlayers) {
 }
 
 function pickOne(pPlayers, sum) {
-  let fitnessTotal = 0;
-  let random = Math.floor(Math.random() * sum);
-  for (i = 0; i < pPlayers.length; i++) {
-    fitnessTotal += pPlayers[i].fitness;
-    if (random < fitnessTotal) {
-      return (pPlayers[i]);
-    }
+  /*   let fitnessTotal = 0;
+    let random = Math.floor(Math.random() * sum);
+    for (i = 0; i < pPlayers.length; i++) {
+      fitnessTotal += pPlayers[i].fitness;
+      if (random < fitnessTotal) {
+        return (pPlayers[i]);
+      }
+    } */
+  var index = 0;
+  var r = random(1);
+  while (r > 0) {
+    r -= pPlayers[index].fitness;
+    index += 1;
   }
+  index -= 1;
+  return pPlayers[index];
 }
 
 function pickbest(pPlayers) {
@@ -343,6 +351,8 @@ function pickbest(pPlayers) {
 
 function renderChart(datachart) {
   var ctx = document.getElementById('myChart').getContext('2d');
+  ctx.height = 360;
+  ctx.width = 800;
   var scatterChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -353,6 +363,7 @@ function renderChart(datachart) {
     },
     options: {
       animation: false,
+      responsive: true,
       scales: {
         xAxes: [{
           type: 'linear',
@@ -361,5 +372,4 @@ function renderChart(datachart) {
       }
     }
   });
-
 }
